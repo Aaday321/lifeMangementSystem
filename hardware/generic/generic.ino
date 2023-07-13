@@ -9,8 +9,12 @@ const int buttonPin = 4;  // the number of the pushbutton pin   // the number of
 const char* serverName = "http://192.168.1.91"; // your server name
 const int serverPort = 3000; // 
 
+
+//debugging variables
 int count = 0;
+int rateLimit = 1000;
 bool wifiConnected = false;
+bool removeLimit = false;
 
 WiFiClient wifiClient;
 
@@ -19,13 +23,12 @@ int buttonState = 0;  // variable for reading the pushbutton status
 
 void setup() {
   Serial.begin(115200);
-  delay(10);
+  delay(5000);
   // initialize the pushbutton pin as an input:
   pinMode(buttonPin, INPUT);
 
   Serial.println("Arduino is connected your computer");
 
-  return;
   // Connect to WiFi network
   Serial.println();
   Serial.println(); 
@@ -34,7 +37,7 @@ void setup() {
 
   WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED && count < 15) {
+  while (WiFi.status() != WL_CONNECTED && count < 20) {
     delay(500);
     Serial.print(".");
     count++;
@@ -46,7 +49,11 @@ void setup() {
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
   } else {
+    Serial.println();
     Serial.print("Could not connect to wifi");
+    Serial.println();
+    Serial.print("Program starting in 2.5 seconds...");
+    delay(2500);
   }
   
   
@@ -56,9 +63,14 @@ void setup() {
 void loop() { 
   buttonState = digitalRead(buttonPin);
   
-  if(count == 100){
-    Serial.println("Hey Dad, I limited the number of attempts to 100");
-  }else{
+  if(buttonState == LOW && removeLimit == false){
+    removeLimit = true;
+  }
+    
+  if(count == rateLimit && removeLimit == false){
+    Serial.println("Hey Dad, I limited the number of attempts to " + String(rateLimit));
+    Serial.println("If the button state is ever LOW, this limit will be programmatically removed");
+  }else if(count < rateLimit || removeLimit == true){
     if (buttonState == HIGH) {
       Serial.println("Clicked " + String(count));
     }
