@@ -38,7 +38,7 @@ void setup() {
     delay(500);
     Serial.print(".");
     count++;
-  }
+  } 
 
   if(WiFi.status() == WL_CONNECTED){
     Serial.println("");
@@ -56,7 +56,7 @@ void setup() {
 void loop() { 
   buttonState = digitalRead(buttonPin);
   
-  if(count > 99){
+  if(count == 100){
     Serial.println("Hey Dad, I limited the number of attempts to 100");
   }else{
     if (buttonState == HIGH) {
