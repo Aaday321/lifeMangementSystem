@@ -5,11 +5,12 @@
 const char* ssid = ""; // replace with your WiFi network name
 const char* password = "";
 const int buttonPin = 4;  // the number of the pushbutton pin   // the number of the LED pin
-bool pressed = false;
+
 const char* serverName = "http://192.168.1.91"; // your server name
 const int serverPort = 3000; // 
 
 int count = 0;
+bool wifiConnected = false;
 
 WiFiClient wifiClient;
 
@@ -22,43 +23,46 @@ void setup() {
   // initialize the pushbutton pin as an input:
   pinMode(buttonPin, INPUT);
 
-  Serial.println("Connected");
-  Serial.println(digitalRead(buttonPin));
+  Serial.println("Arduino is connected your computer");
 
   return;
   // Connect to WiFi network
   Serial.println();
   Serial.println(); 
-  Serial.print("connecting to ");
+  Serial.print("Attempting to connect to wifi");
   Serial.println(ssid);
 
   WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED && count < 15) {
     delay(500);
     Serial.print(".");
+    count++;
   }
 
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-
+  if(WiFi.status() == WL_CONNECTED){
+    Serial.println("");
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+  } else {
+    Serial.print("Could not connect to wifi");
+  }
+  
+  
+  count = 0;
 }
 
 void loop() { 
-  if(count > 4){
-    return;
-  }
-  Serial.println("Digital Read:");
-  Serial.println(digitalRead(buttonPin));
-  count++;
-  // read the state of the pushbutton value:
   buttonState = digitalRead(buttonPin);
   
-  // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
-  if (buttonState == HIGH) {
-    pressed = true;
-    Serial.println("Clicked");
+  if(count > 99){
+    Serial.println("Hey Dad, I limited the number of attempts to 100");
+  }else{
+    if (buttonState == HIGH) {
+      Serial.println("Clicked " + String(count));
+    }
   }
+  
+  count++;
 }
